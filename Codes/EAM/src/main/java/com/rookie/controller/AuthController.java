@@ -55,7 +55,9 @@ public class AuthController {
      */
     @GetMapping("/logout/user")
     public String userLogout(HttpSession session) {
-        //Todo
+        session.removeAttribute("user");
+        session.invalidate();
+        return "logout";
     }
 
     /**
@@ -68,7 +70,39 @@ public class AuthController {
     @PostMapping("/users")
     @ResponseBody
     public JsonResponse userLogin(@RequestParam(value="info") String info, HttpServletRequest request, HttpServletResponse response) {
-        //Todo
+        HttpSession session = request.getSession();
+
+        //解析info, 拿到解密后的信息
+        String userData = DataUtil.decodeBase64(info, 3);
+
+        //将数据转换为user的信息
+        String[] userInfo = AuthUtil.getUserInfo(userData);
+
+        //登录验证
+        int status = userManageService.verify(userInfo[0], userInfo[1]);
+
+        //验证成功
+        if (status == 0) {
+
+            //获取对应的manager
+            User user = userManageService.findByUsername(userInfo[0]);
+
+            //生成token
+            String token = DataUtil.encodeMD5Hex(userData + System.currentTimeMillis());
+
+            //session中设置token
+            session.setAttribute(token, user);
+
+            //添加cookie到response
+            Cookie cookie = new Cookie("user", token);
+            cookie.setPath("/");
+            cookie.setMaxAge(3600);
+            response.addCookie(cookie);
+
+            return new JsonResponse(302, "/api/user/properties/pNo/1/pSz/10");
+        } else {//验证失败
+            return new JsonResponse(302, "/api/auth/error");
+        }
     }
 
     /**

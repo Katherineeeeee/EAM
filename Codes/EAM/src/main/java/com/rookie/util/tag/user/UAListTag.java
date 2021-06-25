@@ -20,6 +20,27 @@ public class UAListTag extends SimpleTagSupport {
 
     @Override
     public void doTag() throws JspException, IOException {
-        //Todo
+        super.doTag();
+        HttpServletRequest request = (HttpServletRequest)((PageContext)getJspContext()).getRequest();
+        HttpSession session = request.getSession();
+        JspWriter jspWriter =getJspContext().getOut();
+        List<Application> applications = (List<Application>) request.getAttribute("applications");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (applications != null) {
+            for (Application application : applications) {
+//                System.out.println(application.getProperty().getpId());
+                jspWriter.write(
+                        "<tr>\n" +
+                                "<td>" + application.getProperty().getpId() + "</td>\n" +
+                                "<td>" + application.getProperty().getpName() + "</td>\n" +
+                                "<td>" + application.getProperty().getpBrand() + "</td>\n" +
+                                "<td>" + application.getProperty().getpModel() + "</td>\n" +
+                                "<td>" + application.getProperty().getpSpec() + "</td>\n" +
+                                "<td>" + dateFormat.format(application.getProperty().getpTime()) + "</td>\n" +
+                                "<td><el-link type=\"primary\" @click=\"returnProperty(" + application.getaId() + ")\">归还</el-link></td>\n" +
+                                "</tr>\n"
+                );
+            }
+        }
     }
 }

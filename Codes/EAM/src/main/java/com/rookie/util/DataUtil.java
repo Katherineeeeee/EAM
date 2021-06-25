@@ -12,7 +12,11 @@ public class DataUtil {
      * @return 解码后的数据
      */
     public static String decodeBase64(String info, int times) {
-        //Todo
+        String userData = info;
+        for (int i = 0; i < times; i++) {
+            userData = new String(Base64.decodeBase64(userData));
+        }
+        return userData;
     }
 
     /**
@@ -22,7 +26,11 @@ public class DataUtil {
      * @return 编码后的数据
      */
     public static String encodeBase64(String info, int times) {
-        //Todo
+        String res = info;
+        for (int i = 0; i < times; i++) {
+            res = new String(Base64.encodeBase64(res.getBytes()));
+        }
+        return res;
     }
 
     /**

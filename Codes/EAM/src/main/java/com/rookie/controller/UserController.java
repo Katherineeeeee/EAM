@@ -37,7 +37,19 @@ public class UserController {
      */
     @GetMapping("/properties/pNo/{pageNo}/pSz/{pageSz}")
     public String viewProperties(@PathVariable Integer pageNo, @PathVariable Integer pageSz, HttpServletRequest request) {
-        //Todo
+        int num = userPropertyService.getNumOfUnused(pageSz);
+        int[] pageInfo = getPageInfo(num, pageNo, pageSz);
+
+        //分页查询
+        List<Property> properties = userPropertyService.findUnusedByPage(pageInfo[0], pageInfo[1]);
+
+        //绑定属性, 用于JSP渲染
+        request.setAttribute("properties", properties);
+        request.setAttribute("curPage", pageInfo[0]);
+        request.setAttribute("sumPage", num);
+        request.setAttribute("prePage", pageInfo[2]);
+        request.setAttribute("nextPage", pageInfo[3]);
+        return "user/userViewProperties";
     }
 
     /**
@@ -54,7 +66,23 @@ public class UserController {
     @PostMapping("/properties/id/{id}")
     @ResponseBody
     public JsonResponse applyProperty(@PathVariable Integer id, HttpServletRequest request) {
-        //Todo
+        Property property = userPropertyService.findBypId(id);
+        User curUser = getUser(request);
+        if (property == null) {
+            return new JsonResponse(403, "申请失败");
+        }
+        if (property.getUser() != null) return new JsonResponse(403, "申请失败");
+        else {
+            boolean exist = userApplicationService.existsByUserAndProperty(curUser, property);
+            if (exist) {
+                return new JsonResponse(403, "已经添加了一个申请");
+            }
+            boolean res = userApplicationService.addApplication(1 ,curUser, property);
+            if (res) return new JsonResponse(302, "/api/user/properties/pNo/1/pSz/10");
+            else {
+                return new JsonResponse(403, "申请失败");
+            }
+        }
     }
 
     /**
@@ -66,7 +94,12 @@ public class UserController {
     @PostMapping("/applications/id/{id}")
     @ResponseBody
     public JsonResponse returnProperty(@PathVariable Integer id, HttpServletRequest request) {
-        //Todo
+        User curUser = getUser(request);
+        boolean res = userApplicationService.returnProperty(id, curUser.getuId());
+        if (res) return new JsonResponse(302, "/api/user/properties/pNo/1/pSz/10");
+        else {
+            return new JsonResponse(403, "归还失败");
+        }
     }
 
     /**
@@ -78,7 +111,21 @@ public class UserController {
      */
     @GetMapping("/applications/pNo/{pageNo}/pSz/{pageSz}")
     public String viewUsed(@PathVariable Integer pageNo, @PathVariable Integer pageSz, HttpServletRequest request) {
-        //Todo
+        User user = getUser(request);
+        if(user == null)return "404";
+        int num = userPropertyService.getNumOfPageByUser(Math.min(10, pageSz), user);
+        int[] pageInfo = getPageInfo(num, pageNo, pageSz);
+
+        //分页查询
+        List<Application> applications = userApplicationService.findByPageAndUser(pageNo,pageSz,"aId",user);
+
+        //绑定属性, 用于JSP渲染
+        request.setAttribute("applications", applications);
+        request.setAttribute("curPage", pageInfo[0]);
+        request.setAttribute("sumPage", num);
+        request.setAttribute("prePage", pageInfo[2]);
+        request.setAttribute("nextPage", pageInfo[3]);
+        return "user/userViewApplications";
     }
 
     /**
@@ -87,7 +134,18 @@ public class UserController {
      * @return 当前登录的用户
      */
     private User getUser(HttpServletRequest request) {
-        //Todo
+        HttpSession session = request.getSession();
+        Cookie[] cookies = request.getCookies();
+        String token = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("user")) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        return token != null ? (User) session.getAttribute(token) : null;
     }
 
     /**
@@ -98,6 +156,21 @@ public class UserController {
      * @return 一个数组, 包含了分页的信息
      */
     private int[] getPageInfo(int num, int pageNo, int pageSz) {
-        //Todo
+        if (pageSz > 10) pageSz = 10;
+        if (pageNo > num) {
+            pageNo = num;
+        }
+        if (pageNo < 1) {
+            pageNo = 1;
+        }
+        int prePage = pageNo - 1;
+        int nextPage = pageNo + 1;
+        if(prePage == 0){
+            prePage = -1;
+        }
+        if(nextPage > num){
+            nextPage = -1;
+        }
+        return new int[]{pageNo, pageSz, prePage, nextPage};
     }
 }

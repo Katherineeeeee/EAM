@@ -19,6 +19,26 @@ public class UPListTag extends SimpleTagSupport {
 
     @Override
     public void doTag() throws JspException, IOException {
-        //Todo
+        super.doTag();
+        HttpServletRequest request = (HttpServletRequest)((PageContext)getJspContext()).getRequest();
+        HttpSession session = request.getSession();
+        JspWriter jspWriter =getJspContext().getOut();
+        List<Property> properties = (List<Property>) request.getAttribute("properties");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        if (properties != null) {
+            for (Property property : properties) {
+                jspWriter.write(
+                        "<tr>\n" +
+                                "<td>" + property.getpId() + "</td>\n" +
+                                "<td>" + property.getpName() + "</td>\n" +
+                                "<td>" + property.getpBrand() + "</td>\n" +
+                                "<td>" + property.getpModel() + "</td>\n" +
+                                "<td>" + property.getpSpec() + "</td>\n" +
+                                "<td>" + dateFormat.format(property.getpTime()) + "</td>\n" +
+                                "<td><el-link type=\"primary\" @click=\"applyProperty(" + property.getpId() + ")\">申请</el-link></td>\n" +
+                                "</tr>\n"
+                );
+            }
+        }
     }
 }

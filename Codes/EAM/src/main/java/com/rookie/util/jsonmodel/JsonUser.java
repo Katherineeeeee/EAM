@@ -15,11 +15,31 @@ public class JsonUser {
     private String info;
 
     public User parse() {
-        //Todo
+        Map<String, String> json = toMap();
+        User user = new User();
+        user.setuName(json.get("username"));
+        user.setuPassword(json.get("password"));
+        user.setuEmail(json.get("email"));
+        try {
+            user.setuStatus(Integer.parseInt(json.get("status")));
+        } catch (Exception e) {
+        }
+        return user;
     }
 
     public Map<String, String> toMap() {
-        //Todo
+        String userData = DataUtil.decodeBase64(info, 3);
+        StringTokenizer tokenizer = new StringTokenizer(userData, "\n");
+        Map<String, String> res = new HashMap<>();
+        String s = null;
+        while (tokenizer.hasMoreTokens()) {
+            s = tokenizer.nextToken();
+            int ix = s.indexOf(":");
+            if (ix != -1) {
+                res.put(s.substring(0, ix), s.substring(ix + 1));
+            }
+        }
+        return res;
     }
 
     public void setInfo(String info) {
