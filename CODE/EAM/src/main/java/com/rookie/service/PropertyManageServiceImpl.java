@@ -24,7 +24,8 @@ public class PropertyManageServiceImpl implements PropertyManageService {
      */
     @Override
     public int getNumOfPage(Integer pageSz) {
-        //Todo
+        int sz = (int)propertyRepo.count();
+        return (sz + pageSz - 1) / pageSz;
     }
 
     /**
@@ -35,7 +36,9 @@ public class PropertyManageServiceImpl implements PropertyManageService {
      */
     @Override
     public List<Property> findByPage(int pageNo, int pageSz) {
-        //Todo
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSz, Sort.by(Sort.Direction.ASC, "pId"));
+        Page<Property> res = propertyRepo.findAll(pageRequest);
+        return res.toList();
     }
 
     /**

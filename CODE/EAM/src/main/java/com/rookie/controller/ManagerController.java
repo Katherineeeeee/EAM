@@ -157,7 +157,19 @@ public class ManagerController {
      */
     @GetMapping("/properties/pNo/{pageNo}/pSz/{pageSz}")
     public String propertyManage(@PathVariable Integer pageNo, @PathVariable Integer pageSz, HttpServletRequest request) {
-        //Todo
+        int num = propertyManageService.getNumOfPage(pageSz);
+        int[] pageInfo = getPageInfo(num, pageNo, pageSz);
+
+        //分页查找
+        List<Property> properties = propertyManageService.findByPage(pageInfo[0], pageInfo[1]);
+
+        //绑定属性, 用于jsp渲染
+        request.setAttribute("properties", properties);
+        request.setAttribute("curPage", pageInfo[0]);
+        request.setAttribute("sumPage", num);
+        request.setAttribute("prePage", pageInfo[2]);
+        request.setAttribute("nextPage", pageInfo[3]);
+        return "manager/propertyManage";
     }
 
     /**
