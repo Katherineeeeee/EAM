@@ -194,7 +194,31 @@ public class ManagerController {
      */
     @GetMapping("/properties/id/{id}/pNo/{pageNo}/pSz/{pageSz}")
     public String getPropertyDetail(@PathVariable Integer id, @PathVariable Integer pageNo, @PathVariable Integer pageSz, HttpServletRequest request) {
-        //Todo
+        Property property = propertyManageService.findBypId(id);
+        if (property == null) return "404";
+        request.setAttribute("property", property);
+
+        int num = applicationManageService.getNumOfPageByPageAndProperty(Math.min(pageSz, 10), property);
+
+        int[] pageInfo = getPageInfo(num, pageNo, pageSz);
+
+        //分页查找
+        List<Application> applications = applicationManageService.findByPageAndProperty(pageInfo[0], pageInfo[1], "aId", property);
+
+        //绑定属性, 用于JSP渲染
+        request.setAttribute("id", property.getpId());
+        request.setAttribute("name", property.getpName());
+        request.setAttribute("brand", property.getpBrand());
+        request.setAttribute("model", property.getpModel());
+        request.setAttribute("spec", property.getpSpec());
+        request.setAttribute("time", property.getpTime());
+        request.setAttribute("status", property.getUser() == null ? "空闲" : "使用中");
+        request.setAttribute("applications", applications);
+        request.setAttribute("curPage", pageInfo[0]);
+        request.setAttribute("sumPage", num);
+        request.setAttribute("prePage", pageInfo[2]);
+        request.setAttribute("nextPage", pageInfo[3]);
+        return "manager/propertyDetail";
     }
 
     /**

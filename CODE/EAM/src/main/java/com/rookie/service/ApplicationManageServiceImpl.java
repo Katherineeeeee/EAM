@@ -63,7 +63,8 @@ public class ApplicationManageServiceImpl implements ApplicationManageService {
      */
     @Override
     public int getNumOfPageByPageAndProperty(int pageSz, Property property) {
-        //Todo
+        int sum = (int) applicationRepo.countByproperty_pId(property.getpId());
+        return (sum + pageSz - 1) / pageSz;
     }
 
     /**
@@ -76,7 +77,9 @@ public class ApplicationManageServiceImpl implements ApplicationManageService {
      */
     @Override
     public List<Application> findByPageAndProperty(int pageNo, int pageSz, String colName, Property property) {
-        //Todo
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSz, Sort.by(Sort.Direction.ASC, colName));
+        Page<Application> res = applicationRepo.findByproperty_pId(pageRequest,property.getpId());
+        return res.toList();
     }
 
     /**
