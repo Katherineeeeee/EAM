@@ -182,6 +182,28 @@ public class ManagerController {
     public JsonResponse addProperty(JsonProperty jsonProperty) {
         //增加一个资产
         //Todo
+        Map<String, String> json = jsonProperty.toMap();
+
+        //读取数量, 数量不存在则为1
+        int num = 1;
+        try{
+            num = Math.max(1, Integer.parseInt(json.get("num")));
+        } catch (Exception e) {
+        }
+        System.out.println(num);
+        //添加Property
+        for (int i = 0; i < num; i++) {
+            Property property = new Property();
+            property.setpName(json.get("name"));
+            property.setpBrand(json.get("brand"));
+            property.setpModel(json.get("model"));
+            property.setpSpec(json.get("spec"));
+            property.setpTime(new Date());
+            if (!propertyManageService.addProperty(property)) {//只要有一个添加失败,就算失败
+                return new JsonResponse(403, "添加失败");
+            }
+        }
+        return new JsonResponse(302, "/api/manager/properties/pNo/1/pSz/10");
     }
 
     /**

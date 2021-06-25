@@ -49,10 +49,17 @@ public class PropertyManageServiceImpl implements PropertyManageService {
     @Override
     public boolean addProperty(Property property) {
         //Todo
+       try {
+            return addProperty1(property);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean addProperty1(@Valid Property property) {
         //Todo
+        propertyRepo.save(property);
+        return true;
     }
 
     /**
