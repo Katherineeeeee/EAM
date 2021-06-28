@@ -17,11 +17,34 @@ public class JsonProperty {
     private String info;
 
     public Pair<Property, Integer> parse() {
-        //Todo
+        Map<String, String> json = toMap();
+        Property property = new Property();
+        property.setpName(json.get("name"));
+        property.setpBrand(json.get("brand"));
+        property.setpModel(json.get("model"));
+        property.setpSpec(json.get("spec"));
+        property.setpTime(new Date());
+        int sum = 1;
+        try{
+            sum = Integer.parseInt(json.get("sum"));
+        } catch (Exception e) {
+        }
+        return Pair.of(property, sum);
     }
 
     public Map<String, String> toMap() {
-        //Todo
+        String userData = DataUtil.decodeBase64(info, 3);
+        StringTokenizer tokenizer = new StringTokenizer(userData, "\n");
+        Map<String, String> res = new HashMap<>();
+        String s = null;
+        while (tokenizer.hasMoreTokens()) {
+            s = tokenizer.nextToken();
+            int ix = s.indexOf(":");
+            if (ix != -1) {
+                res.put(s.substring(0, ix), s.substring(ix + 1));
+            }
+        }
+        return res;
     }
 
     public String getInfo() {

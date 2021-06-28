@@ -25,7 +25,8 @@ public class UserPropertyServiceImpl implements UserPropertyService {
      */
     @Override
     public int getNumOfPage(Integer pageSz) {
-        //Todo
+        int sz = (int)propertyRepo.count();
+        return (sz + pageSz - 1) / pageSz;
     }
 
     /**
@@ -36,7 +37,9 @@ public class UserPropertyServiceImpl implements UserPropertyService {
      */
     @Override
     public List<Property> findByPage(int pageNo, int pageSz) {
-        //Todo
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSz, Sort.by(Sort.Direction.ASC, "pId"));
+        Page<Property> res = propertyRepo.findAll(pageRequest);
+        return res.toList();
     }
 
     /**
@@ -46,7 +49,11 @@ public class UserPropertyServiceImpl implements UserPropertyService {
      */
     @Override
     public boolean addProperty(Property property) {
-        //Todo
+        try {
+            return addProperty1(property);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -55,7 +62,8 @@ public class UserPropertyServiceImpl implements UserPropertyService {
      * @return 添加是否成功
      */
     public boolean addProperty1(@Valid Property property) {
-        //Todo
+        propertyRepo.save(property);
+        return true;
     }
 
     /**
@@ -75,7 +83,8 @@ public class UserPropertyServiceImpl implements UserPropertyService {
      */
     @Override
     public int getNumOfUnused(Integer pageSz) {
-        //Todo
+        int sum = (int)propertyRepo.countByUnused();
+        return (sum + pageSz - 1) / pageSz;
     }
 
     /**
@@ -86,7 +95,8 @@ public class UserPropertyServiceImpl implements UserPropertyService {
      */
     @Override
     public List<Property> findUnusedByPage(int pageNo, int pageSz) {
-        //Todo
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSz, Sort.by(Sort.Direction.ASC, "pId"));
+        return propertyRepo.findUnusedByPage(pageRequest).toList();
     }
 
     /**
@@ -97,7 +107,8 @@ public class UserPropertyServiceImpl implements UserPropertyService {
      */
     @Override
     public int getNumOfPageByUser(int pageSz, User user) {
-        //Todo
+        int sum = (int) propertyRepo.countByuser_uId(user.getuId());
+        return (sum + pageSz - 1) / pageSz;
     }
 
     /**
@@ -110,7 +121,8 @@ public class UserPropertyServiceImpl implements UserPropertyService {
      */
     @Override
     public List<Property> findByPageByUser(Integer pageNo, Integer pageSz, String colName, User user) {
-        //Todo
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSz, Sort.by(Sort.Direction.ASC, colName));
+        return propertyRepo.findByuser_uId(pageRequest,user.getuId()).toList();
     }
 
 }

@@ -36,7 +36,9 @@ public class UserApplicationServiceImpl implements UserApplicationService {
      */
     @Override
     public List<Application> findByPageAndUser(Integer pageNo, Integer pageSz, String colName, User user) {
-        //Todo
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSz, Sort.by(Sort.Direction.ASC, colName));
+        Page<Application> res = applicationRepo.findByUserAndaStatus(user.getuId(), 1, pageRequest);
+        return res.toList();
     }
 
     /**
@@ -47,7 +49,17 @@ public class UserApplicationServiceImpl implements UserApplicationService {
      */
     @Override
     public boolean returnProperty(int aId, int uId) {
-        //Todo
+        Application application = applicationRepo.findByaId(aId).orElse(null);
+        if (application == null) return false;
+        if (application.getaStatus() == 1 && application.getUser().getuId() == uId) {//没有被关闭过
+            application.setaStatus(2);//关闭
+            application.getProperty().setUser(null);
+            application.setEndTime(new Date());
+            propertyRepo.save(application.getProperty());
+            applicationRepo.save(application);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -57,7 +69,8 @@ public class UserApplicationServiceImpl implements UserApplicationService {
      */
     @Override
     public int getNumOfPage(int pageSz) {
-        //Todo
+        int sum = (int) applicationRepo.countByaStatusEquals(0);
+        return (sum + pageSz - 1) / pageSz;
     }
 
     /**
@@ -68,7 +81,9 @@ public class UserApplicationServiceImpl implements UserApplicationService {
      */
     @Override
     public List<Application> findByPage(int pageNo, int pageSz) {
-        //Todo
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSz, Sort.by(Sort.Direction.DESC, "beginTime"));
+        Page<Application> res = applicationRepo.findAllUnChecked(pageRequest);
+        return res.toList();
     }
 
     /**
@@ -80,7 +95,14 @@ public class UserApplicationServiceImpl implements UserApplicationService {
      */
     @Override
     public boolean addApplication(Integer operation, User curUser, Property property) {
-        //Todo
+        Application application = new Application();
+        application.setaStatus(0);
+        application.setOperation(operation);
+        application.setUser(curUser);
+        application.setBeginTime(new Date());
+        application.setProperty(property);
+        applicationRepo.save(application);
+        return true;
     }
 
     /**
@@ -91,6 +113,7 @@ public class UserApplicationServiceImpl implements UserApplicationService {
      */
     @Override
     public boolean existsByUserAndProperty(User curUser, Property property) {
-        //Todo
+        Application application = applicationRepo.findByuser_uIdAndproperty_pId(curUser.getuId(), property.getpId()).orElse(null);
+        return application != null;
     }
 }
