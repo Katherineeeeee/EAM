@@ -39,7 +39,8 @@ public class ApplicationManageServiceImpl implements ApplicationManageService {
      */
     @Override
     public int getNumOfPageAndUser(int pageSz, User user) {
-        //Todo
+        int sum = (int) applicationRepo.countByuser_uId(user.getuId());
+        return (sum + pageSz - 1) / pageSz;
     }
 
     /**
@@ -52,7 +53,9 @@ public class ApplicationManageServiceImpl implements ApplicationManageService {
      */
     @Override
     public List<Application> findByPageAndUser(int pageNo, int pageSz, String colName, User user) {
-        //Todo
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSz, Sort.by(Sort.Direction.ASC, colName));
+        Page<Application> res = applicationRepo.findByuser_uId(pageRequest,user.getuId());
+        return res.toList();
     }
 
     /**

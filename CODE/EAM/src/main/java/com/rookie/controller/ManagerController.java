@@ -70,7 +70,19 @@ public class ManagerController {
      */
     @GetMapping("/users/pNo/{pageNo}/pSz/{pageSz}")
     public String userManage(@PathVariable Integer pageNo, @PathVariable Integer pageSz, HttpServletRequest request) {
-        ///Todo
+        int num = userManageService.getNumOfPage(pageSz);
+        int[] pageInfo = getPageInfo(num, pageNo, pageSz);
+
+        //分页查找
+        List<User> users = userManageService.findByPage(pageInfo[0], pageInfo[1]);
+
+        //绑定属性, 用于jsp渲染
+        request.setAttribute("users", users);
+        request.setAttribute("curPage", pageInfo[0]);
+        request.setAttribute("sumPage", num);
+        request.setAttribute("prePage", pageInfo[2]);
+        request.setAttribute("nextPage", pageInfo[3]);
+        return "manager/userManage";
     }
 
     /**
@@ -83,7 +95,30 @@ public class ManagerController {
      */
     @GetMapping("/users/id/{id}/pNo/{pageNo}/pSz/{pageSz}")
     public String getUserDetail(@PathVariable Integer id, @PathVariable Integer pageNo, @PathVariable Integer pageSz, HttpServletRequest request) {
-        //Todo
+        User user = userManageService.findByuId(id);
+        if (user == null) {
+            return "404";
+        }
+        request.setAttribute("user",user);
+
+        int num = applicationManageService.getNumOfPageAndUser(Math.min(pageSz, 10),user);
+
+        int[] pageInfo = getPageInfo(num, pageNo, pageSz);
+
+        //分页查找
+        List<Application> applications = applicationManageService.findByPageAndUser(pageInfo[0], pageInfo[1], "aId", user);
+
+        //绑定属性, 用于jsp渲染
+        request.setAttribute("userid", id);
+        request.setAttribute("username", user.getuName());
+        request.setAttribute("email", user.getuEmail());
+        request.setAttribute("status", user.getuStatus() == 1 ? "激活" : (user.getuStatus() == -1 ? "删除" : "冻结"));
+        request.setAttribute("applications", applications);
+        request.setAttribute("curPage", pageInfo[0]);
+        request.setAttribute("sumPage", num);
+        request.setAttribute("prePage", pageInfo[2]);
+        request.setAttribute("nextPage", pageInfo[3]);
+        return "manager/userDetail";
     }
 
     /**

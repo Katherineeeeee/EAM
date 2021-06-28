@@ -47,7 +47,9 @@ public class UserManageServiceImpl implements UserManageService {
      */
     @Override
     public List<User> findByPage(int pageNo, int pageSz) {
-        //Todo
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSz, Sort.by(Sort.Direction.ASC, "uId"));
+        Page<User> res = userRepo.findAll(pageRequest);
+        return res.toList();
     }
 
     /**
@@ -68,7 +70,8 @@ public class UserManageServiceImpl implements UserManageService {
      */
     @Override
     public int getNumOfPage(Integer pageSz) {
-        //Todo
+        int num = (int)userRepo.count();
+        return (num + pageSz - 1) / pageSz;
     }
 
     /**
