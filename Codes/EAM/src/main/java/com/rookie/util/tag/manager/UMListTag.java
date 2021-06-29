@@ -13,7 +13,6 @@ import java.util.List;
 
 /**
  * UserManage中列表的SimpleTag处理器
- * @author 庞新程
  * @version 1.0
  */
 public class UMListTag extends SimpleTagSupport {

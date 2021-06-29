@@ -17,7 +17,6 @@ import java.util.List;
 
 /**
  * UserDetail中列表的SimpleTag处理类
- * @author 庞新程
  * @version 1.0
  */
 public class UDListTag extends SimpleTagSupport {
