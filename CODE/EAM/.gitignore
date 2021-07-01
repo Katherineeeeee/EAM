@@ -1,0 +1,21 @@
+### Compile ###  
+/target/
+/out/
+
+### MAC ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### logs ###
+/stacktrace.log
+/test/reports
+/logs
+*.log
+*.log.*
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr

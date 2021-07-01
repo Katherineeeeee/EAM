@@ -1,0 +1,20 @@
+body {
+	background: url(../img/background.png) no-repeat center center;
+	background-size:cover;  /* 让背景图基于容器大小伸缩 */
+	background-attachment:fixed;
+}
+
+.container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.input-form {
+	display: flex;
+}
+
+.button-form {
+	display: flex;
+	justify-content: center;
+}
